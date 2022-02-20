@@ -1,0 +1,69 @@
+version: '3.6'
+x-logging:
+  &default-logging
+  driver: json-file
+  options:
+    max-size: "10M"
+    max-file: "10"
+networks:
+  app-network:
+    driver: ${NETWORKS_DRIVER}
+    external: true
+    name: ${NETWORKS_ALIAS}
+volumes:
+  clash:
+    driver: ${VOLUMES_DRIVER}
+services:
+  subconverter:
+    env_file:
+      - .env
+    logging: *default-logging
+    restart: unless-stopped
+    networks:
+      app-network:
+        aliases:
+            - subconverter
+    container_name: subconverter
+    image: tindy2013/subconverter
+    ports:
+      - '25500:25500'
+#    volumes:
+#      - ../../data/subconverter/base:/base
+  clash:
+    env_file:
+      - .env
+    logging: *default-logging
+    restart: unless-stopped
+    networks:
+      - app-network
+    container_name: clash
+#    image: dreamacro/clash
+    image: nickfan/docker-clash-ui
+    ports:
+      - '7890:7890'
+      - '7891:7891'
+      - '7892:7892'
+      - '7880:9090'
+#      - '53:53/udp'
+    volumes:
+#      - ${HOME}/.config/clash:/root/.config/clash
+#      - ${DATA_PATH_HOST}/clash/config:/root/.config/clash
+      - ./data/clash/config:/root/.config/clash
+#       - ${DATA_PATH_HOST}/clash/config/config.yaml:/root/.config/clash/config.yaml
+      # - //var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - subconverter
+#    cap_add:
+#      - NET_ADMIN
+#  clash-dashboard:
+#    env_file: [ '../../.env', './.env.app' ]
+#    logging: *default-logging
+#    restart: unless-stopped
+#    networks:
+#      - app-network
+#    container_name: clash-dashboard
+#    image: hitian/clash-dashboard
+#    ports:
+#      - '8090:80'
+#    depends_on:
+#      - clash

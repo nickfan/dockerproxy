@@ -1,0 +1,13 @@
+/data/clash/config/*
+/data/clash/config/config.yml
+/data/clash/config/config.yaml
+!/data/clash/config/config.template.yml
+!/data/clash/config/.gitignore
+
+.env
+.env.app
+.env.app.*
+!.env.app.example
+!.env.example
+
+docker-compose.spec-*.yml
